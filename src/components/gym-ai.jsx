@@ -153,13 +153,23 @@ export default function GymAI() {
 
     if (isSignup) {
       if (!loginForm.name) { setAuthError("이름을 입력해주세요."); setAuthLoading(false); return; }
-      const { error } = await signUp(loginForm.email, loginForm.password, loginForm.name);
+      console.log("=== 회원가입 시도 ===");
+      console.log("Email:", loginForm.email);
+      console.log("Name:", loginForm.name);
+      const { data, error } = await signUp(loginForm.email, loginForm.password, loginForm.name);
+      console.log("SignUp 결과 - data:", data);
+      console.log("SignUp 결과 - error:", error);
       if (error) {
         setAuthError(error.message === "User already registered" ? "이미 가입된 이메일이에요." : "회원가입 실패: " + error.message);
       }
     } else {
-      const { error } = await signIn(loginForm.email, loginForm.password);
+      console.log("=== 로그인 시도 ===");
+      console.log("Email:", loginForm.email);
+      const { data, error } = await signIn(loginForm.email, loginForm.password);
+      console.log("SignIn 결과 - data:", data);
+      console.log("SignIn 결과 - error:", error);
       if (error) {
+        console.log("로그인 에러 발생:", error.message);
         setAuthError("이메일 또는 비밀번호가 틀렸어요.");
       }
     }
