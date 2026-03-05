@@ -1,0 +1,242 @@
+// src/lib/plan/fallbackPlan.ts
+// 폴백 플랜 - AI 실패 시 사용하는 기본 플랜
+
+import { Plan } from "./planSchema";
+
+/**
+ * 3일 분할 푸쉬/풀/레그 기본 플랜
+ * 초보자/중급자 모두 안전하게 수행 가능
+ */
+export const fallbackPlan: Plan = {
+  plan_version: "1.0",
+  split_id: "3day_push_pull_legs",
+  split_name_ko: "3일 분할 (푸쉬/풀/레그)",
+  weekly_schedule_ko: "주 3회 운동. 운동일 사이에 충분한 휴식을 취하세요. 예: 월/수/금 또는 화/목/토",
+  days: [
+    {
+      day_index: 1,
+      title_ko: "푸쉬 데이 (밀기)",
+      focus_ko: "가슴, 어깨, 삼두",
+      estimated_minutes: 50,
+      warmup: [
+        "5분 가벼운 유산소 (트레드밀 또는 자전거)",
+        "어깨 돌리기 20회",
+        "팔 벌려 뛰기 20회",
+        "가벼운 푸쉬업 10회",
+      ],
+      exercises: [
+        {
+          exercise_key: "bench_press",
+          name_ko: "벤치 프레스",
+          muscle_ko: "가슴",
+          equipment_ko: "바벨",
+          sets: 3,
+          reps: "8-10",
+          rest_seconds: 90,
+          instructions_ko: "바를 가슴 중앙으로 천천히 내리고, 가슴에 힘을 주며 밀어올리세요.",
+        },
+        {
+          exercise_key: "incline_dumbbell_press",
+          name_ko: "인클라인 덤벨 프레스",
+          muscle_ko: "상부 가슴",
+          equipment_ko: "덤벨",
+          sets: 3,
+          reps: "10-12",
+          rest_seconds: 75,
+          instructions_ko: "벤치를 30-45도로 설정하고, 덤벨을 가슴 위로 밀어올리세요.",
+        },
+        {
+          exercise_key: "overhead_press",
+          name_ko: "오버헤드 프레스",
+          muscle_ko: "어깨",
+          equipment_ko: "바벨",
+          sets: 3,
+          reps: "8-10",
+          rest_seconds: 90,
+          instructions_ko: "바를 어깨 위에서 머리 위로 밀어올리세요. 코어에 힘을 유지하세요.",
+        },
+        {
+          exercise_key: "lateral_raise",
+          name_ko: "사이드 레터럴 레이즈",
+          muscle_ko: "측면 어깨",
+          equipment_ko: "덤벨",
+          sets: 3,
+          reps: "12-15",
+          rest_seconds: 60,
+          instructions_ko: "팔을 옆으로 들어올려 어깨 높이까지 올리세요. 반동 없이 천천히.",
+        },
+        {
+          exercise_key: "tricep_pushdown",
+          name_ko: "트라이셉 푸쉬다운",
+          muscle_ko: "삼두",
+          equipment_ko: "케이블",
+          sets: 3,
+          reps: "12-15",
+          rest_seconds: 60,
+          instructions_ko: "팔꿈치를 고정하고 케이블을 아래로 밀어내세요.",
+        },
+      ],
+      cooldown: [
+        "가슴 스트레칭 30초",
+        "어깨 스트레칭 30초",
+        "삼두 스트레칭 30초",
+        "심호흡 5회",
+      ],
+    },
+    {
+      day_index: 2,
+      title_ko: "풀 데이 (당기기)",
+      focus_ko: "등, 이두, 후면 어깨",
+      estimated_minutes: 50,
+      warmup: [
+        "5분 가벼운 유산소",
+        "밴드 풀어파트 15회",
+        "팔 돌리기 앞/뒤 각 15회",
+        "버드독 10회 (양쪽)",
+      ],
+      exercises: [
+        {
+          exercise_key: "lat_pulldown",
+          name_ko: "랫 풀다운",
+          muscle_ko: "광배근",
+          equipment_ko: "케이블",
+          sets: 3,
+          reps: "10-12",
+          rest_seconds: 75,
+          instructions_ko: "바를 가슴 쪽으로 당기며 견갑골을 모아주세요.",
+        },
+        {
+          exercise_key: "seated_cable_row",
+          name_ko: "시티드 케이블 로우",
+          muscle_ko: "등 중앙",
+          equipment_ko: "케이블",
+          sets: 3,
+          reps: "10-12",
+          rest_seconds: 75,
+          instructions_ko: "등을 곧게 유지하고 핸들을 복부 쪽으로 당기세요.",
+        },
+        {
+          exercise_key: "dumbbell_row",
+          name_ko: "원암 덤벨 로우",
+          muscle_ko: "광배근",
+          equipment_ko: "덤벨",
+          sets: 3,
+          reps: "10-12",
+          rest_seconds: 75,
+          instructions_ko: "벤치에 한 손을 짚고, 덤벨을 허리 쪽으로 당기세요.",
+        },
+        {
+          exercise_key: "face_pull",
+          name_ko: "페이스 풀",
+          muscle_ko: "후면 어깨",
+          equipment_ko: "케이블",
+          sets: 3,
+          reps: "15-20",
+          rest_seconds: 60,
+          instructions_ko: "로프를 얼굴 쪽으로 당기며 팔꿈치를 높이 들어올리세요.",
+        },
+        {
+          exercise_key: "bicep_curl",
+          name_ko: "바이셉 컬",
+          muscle_ko: "이두",
+          equipment_ko: "덤벨",
+          sets: 3,
+          reps: "10-12",
+          rest_seconds: 60,
+          instructions_ko: "팔꿈치를 고정하고 덤벨을 어깨 쪽으로 올리세요.",
+        },
+      ],
+      cooldown: [
+        "등 스트레칭 (고양이 자세) 30초",
+        "이두 스트레칭 30초",
+        "어깨 스트레칭 30초",
+        "심호흡 5회",
+      ],
+    },
+    {
+      day_index: 3,
+      title_ko: "레그 데이 (하체)",
+      focus_ko: "대퇴사두, 햄스트링, 둔근, 종아리",
+      estimated_minutes: 55,
+      warmup: [
+        "5분 가벼운 유산소",
+        "바디웨이트 스쿼트 15회",
+        "레그 스윙 앞/뒤 각 10회",
+        "레그 스윙 좌/우 각 10회",
+        "글루트 브릿지 15회",
+      ],
+      exercises: [
+        {
+          exercise_key: "leg_press",
+          name_ko: "레그 프레스",
+          muscle_ko: "대퇴사두, 둔근",
+          equipment_ko: "머신",
+          sets: 4,
+          reps: "10-12",
+          rest_seconds: 90,
+          instructions_ko: "발을 어깨 너비로 벌리고, 무릎이 발끝을 넘지 않게 내리세요.",
+        },
+        {
+          exercise_key: "goblet_squat",
+          name_ko: "고블릿 스쿼트",
+          muscle_ko: "대퇴사두, 둔근",
+          equipment_ko: "덤벨",
+          sets: 3,
+          reps: "10-12",
+          rest_seconds: 75,
+          instructions_ko: "덤벨을 가슴 앞에 잡고 깊게 앉았다 일어나세요.",
+        },
+        {
+          exercise_key: "romanian_deadlift",
+          name_ko: "루마니안 데드리프트",
+          muscle_ko: "햄스트링, 둔근",
+          equipment_ko: "바벨",
+          sets: 3,
+          reps: "10-12",
+          rest_seconds: 90,
+          instructions_ko: "무릎을 살짝 구부리고 엉덩이를 뒤로 빼며 바를 내리세요.",
+        },
+        {
+          exercise_key: "leg_curl",
+          name_ko: "레그 컬",
+          muscle_ko: "햄스트링",
+          equipment_ko: "머신",
+          sets: 3,
+          reps: "12-15",
+          rest_seconds: 60,
+          instructions_ko: "발목을 패드에 걸고 다리를 구부려 올리세요.",
+        },
+        {
+          exercise_key: "calf_raise",
+          name_ko: "카프 레이즈",
+          muscle_ko: "종아리",
+          equipment_ko: "머신",
+          sets: 3,
+          reps: "15-20",
+          rest_seconds: 45,
+          instructions_ko: "발끝으로 밀어 올라가고 천천히 내려오세요.",
+        },
+      ],
+      cooldown: [
+        "대퇴사두 스트레칭 30초",
+        "햄스트링 스트레칭 30초",
+        "둔근 스트레칭 30초",
+        "종아리 스트레칭 30초",
+        "심호흡 5회",
+      ],
+    },
+  ],
+  notes_ko: [
+    "각 운동 전 가벼운 무게로 워밍업 세트를 수행하세요.",
+    "통증이 있으면 즉시 중단하고 전문가와 상담하세요.",
+    "충분한 수분 섭취와 단백질 섭취를 권장합니다.",
+    "운동일 사이에 최소 1일 휴식을 권장합니다.",
+  ],
+};
+
+/**
+ * 폴백 플랜 반환 함수
+ */
+export function getFallbackPlan(): Plan {
+  return JSON.parse(JSON.stringify(fallbackPlan)); // deep copy
+}

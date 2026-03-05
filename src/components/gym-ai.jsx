@@ -214,7 +214,9 @@ export default function GymAI() {
     setOnboardingDone(true);
     setIsTyping(false);
     const name = user.user_metadata?.name || user.email.split("@")[0];
-    addMessage("assistant", `${name}님을 위한 ${plan.split}이 완성되었습니다! 💪\n\n'운동 계획' 탭에서 루틴을 확인하거나 "오늘 운동 알려줘"라고 말씀해 보세요!`);
+    // 새 스키마 vs 레거시 스키마 호환
+    const splitName = plan.split_name_ko || plan.split;
+    addMessage("assistant", `${name}님을 위한 ${splitName}이 완성되었습니다! 💪\n\n'운동 계획' 탭에서 루틴을 확인하거나 "오늘 운동 알려줘"라고 말씀해 보세요!`);
   }
 
   async function handleTextInput(text) {
@@ -352,7 +354,12 @@ JSON 구조:
     const todayPlan = workoutPlan.days[dayOfWeek % workoutPlan.days.length];
     setTodaySession({ ...todayPlan, date: todayKey(), completed: todayPlan.exercises.map(() => false), notes: "" });
     setActiveTab("today");
-    return `오늘은 **${todayPlan.name}** 날이에요! 💪\n📌 ${todayPlan.focus}\n⏱️ ${todayPlan.duration}분\n\n'오늘 운동' 탭에서 확인하세요!`;
+    // 새 스키마 vs 레거시 스키마 호환
+    const isNewSchema = todayPlan.title_ko !== undefined;
+    const dayName = isNewSchema ? todayPlan.title_ko : todayPlan.name;
+    const dayFocus = isNewSchema ? todayPlan.focus_ko : todayPlan.focus;
+    const dayDuration = isNewSchema ? todayPlan.estimated_minutes : todayPlan.duration;
+    return `오늘은 **${dayName}** 날이에요! 💪\n📌 ${dayFocus}\n⏱️ ${dayDuration}분\n\n'오늘 운동' 탭에서 확인하세요!`;
   }
 
   // ─── 오늘 운동 세션 ────────────────────────────────────────────────────────
@@ -557,46 +564,114 @@ function PlanTab({ plan }) {
       <div style={{ color: "#555", fontSize: 14, marginTop: 8 }}>채팅 탭에서 온보딩을 완료해주세요!</div>
     </div>
   );
+
+  // 새 스키마 vs 레거시 스키마 호환
+  const isNewSchema = plan.plan_version === "1.0";
+  const splitName = isNewSchema ? plan.split_name_ko : plan.split;
+  const weeklySchedule = isNewSchema ? plan.weekly_schedule_ko : plan.weeklySchedule;
+
+  // 레거시 스키마의 글로벌 웜업/쿨다운
+  const legacyWarmup = !isNewSchema && plan.warmup?.exercises;
+  const legacyCooldown = !isNewSchema && plan.cooldown?.exercises;
+
   return (
     <div style={{ padding: 16 }}>
       <div style={{ background: "linear-gradient(135deg,rgba(124,92,252,0.2),rgba(92,138,252,0.1))", border: "1px solid rgba(124,92,252,0.3)", borderRadius: 16, padding: 20, marginBottom: 20 }}>
-        <div style={{ fontSize: 20, fontWeight: 700, color: "#fff" }}>🏋️ {plan.split}</div>
-        <div style={{ fontSize: 13, color: "#aaa", marginTop: 6 }}>{plan.weeklySchedule}</div>
+        <div style={{ fontSize: 20, fontWeight: 700, color: "#fff" }}>🏋️ {splitName}</div>
+        <div style={{ fontSize: 13, color: "#aaa", marginTop: 6 }}>{weeklySchedule}</div>
+        {isNewSchema && plan.split_id && (
+          <span className="badge" style={{ background: "rgba(124,92,252,0.2)", color: "#b4a0ff", marginTop: 8, display: "inline-block" }}>{plan.split_id}</span>
+        )}
       </div>
-      <div style={{ background: "rgba(255,200,0,0.06)", border: "1px solid rgba(255,200,0,0.2)", borderRadius: 14, padding: 16, marginBottom: 12 }}>
-        <div style={{ fontSize: 14, fontWeight: 700, color: "#ffc107", marginBottom: 8 }}>🔥 워밍업 ({plan.warmup?.duration}분)</div>
-        {plan.warmup?.exercises?.map((ex, i) => <div key={i} style={{ fontSize: 13, color: "#ccc", padding: "3px 0" }}>• {ex}</div>)}
-      </div>
-      {plan.days?.map((day, i) => (
-        <div key={i} className="day-card">
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-            <div>
-              <div style={{ fontSize: 16, fontWeight: 700, color: "#fff" }}>Day {day.day} – {day.name}</div>
-              <div style={{ fontSize: 12, color: "#7c5cfc", marginTop: 2 }}>{day.focus}</div>
-            </div>
-            <span className="badge" style={{ background: "rgba(124,92,252,0.2)", color: "#b4a0ff" }}>⏱️ {day.duration}분</span>
-          </div>
-          {day.exercises?.map((ex, j) => (
-            <div key={j} className="exercise-card">
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                <div>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: "#fff" }}>{ex.name}</div>
-                  <div style={{ fontSize: 12, color: "#888", marginTop: 2 }}>{ex.muscle}</div>
-                  <div style={{ fontSize: 12, color: "#666", marginTop: 4 }}>{ex.instructions}</div>
-                </div>
-                <div style={{ textAlign: "right", flexShrink: 0, marginLeft: 12 }}>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: "#7c5cfc" }}>{ex.sets} x {ex.reps}</div>
-                  <div style={{ fontSize: 11, color: "#666", marginTop: 2 }}>휴식 {ex.rest_seconds}초</div>
-                </div>
-              </div>
-            </div>
-          ))}
+
+      {/* 레거시: 글로벌 웜업 */}
+      {legacyWarmup && (
+        <div style={{ background: "rgba(255,200,0,0.06)", border: "1px solid rgba(255,200,0,0.2)", borderRadius: 14, padding: 16, marginBottom: 12 }}>
+          <div style={{ fontSize: 14, fontWeight: 700, color: "#ffc107", marginBottom: 8 }}>🔥 워밍업 ({plan.warmup?.duration}분)</div>
+          {plan.warmup?.exercises?.map((ex, i) => <div key={i} style={{ fontSize: 13, color: "#ccc", padding: "3px 0" }}>• {ex}</div>)}
         </div>
-      ))}
-      <div style={{ background: "rgba(0,200,200,0.06)", border: "1px solid rgba(0,200,200,0.2)", borderRadius: 14, padding: 16 }}>
-        <div style={{ fontSize: 14, fontWeight: 700, color: "#4dd", marginBottom: 8 }}>❄️ 쿨다운 ({plan.cooldown?.duration}분)</div>
-        {plan.cooldown?.exercises?.map((ex, i) => <div key={i} style={{ fontSize: 13, color: "#ccc", padding: "3px 0" }}>• {ex}</div>)}
-      </div>
+      )}
+
+      {plan.days?.map((day, i) => {
+        // 새 스키마 vs 레거시 스키마 필드 매핑
+        const dayIndex = isNewSchema ? day.day_index : day.day;
+        const dayTitle = isNewSchema ? day.title_ko : day.name;
+        const dayFocus = isNewSchema ? day.focus_ko : day.focus;
+        const dayDuration = isNewSchema ? day.estimated_minutes : day.duration;
+        const dayWarmup = isNewSchema ? day.warmup : null;
+        const dayCooldown = isNewSchema ? day.cooldown : null;
+
+        return (
+          <div key={i} className="day-card">
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+              <div>
+                <div style={{ fontSize: 16, fontWeight: 700, color: "#fff" }}>Day {dayIndex} – {dayTitle}</div>
+                <div style={{ fontSize: 12, color: "#7c5cfc", marginTop: 2 }}>{dayFocus}</div>
+              </div>
+              <span className="badge" style={{ background: "rgba(124,92,252,0.2)", color: "#b4a0ff" }}>⏱️ {dayDuration}분</span>
+            </div>
+
+            {/* 새 스키마: Day별 웜업 */}
+            {dayWarmup && dayWarmup.length > 0 && (
+              <div style={{ background: "rgba(255,200,0,0.04)", borderRadius: 10, padding: 12, marginBottom: 10 }}>
+                <div style={{ fontSize: 12, fontWeight: 600, color: "#ffc107", marginBottom: 6 }}>🔥 웜업</div>
+                {dayWarmup.map((w, wi) => <div key={wi} style={{ fontSize: 12, color: "#bbb", padding: "2px 0" }}>• {w}</div>)}
+              </div>
+            )}
+
+            {day.exercises?.map((ex, j) => {
+              // 새 스키마 vs 레거시 스키마 필드 매핑
+              const exName = isNewSchema ? ex.name_ko : ex.name;
+              const exMuscle = isNewSchema ? ex.muscle_ko : ex.muscle;
+              const exInstructions = isNewSchema ? ex.instructions_ko : ex.instructions;
+              const exEquipment = isNewSchema ? ex.equipment_ko : null;
+
+              return (
+                <div key={j} className="exercise-card">
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 14, fontWeight: 600, color: "#fff" }}>{exName}</div>
+                      <div style={{ fontSize: 12, color: "#888", marginTop: 2 }}>
+                        {exMuscle}
+                        {exEquipment && <span style={{ color: "#666" }}> • {exEquipment}</span>}
+                      </div>
+                      <div style={{ fontSize: 12, color: "#666", marginTop: 4 }}>{exInstructions}</div>
+                    </div>
+                    <div style={{ textAlign: "right", flexShrink: 0, marginLeft: 12 }}>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: "#7c5cfc" }}>{ex.sets} x {ex.reps}</div>
+                      <div style={{ fontSize: 11, color: "#666", marginTop: 2 }}>휴식 {ex.rest_seconds}초</div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+
+            {/* 새 스키마: Day별 쿨다운 */}
+            {dayCooldown && dayCooldown.length > 0 && (
+              <div style={{ background: "rgba(0,200,200,0.04)", borderRadius: 10, padding: 12, marginTop: 10 }}>
+                <div style={{ fontSize: 12, fontWeight: 600, color: "#4dd", marginBottom: 6 }}>❄️ 쿨다운</div>
+                {dayCooldown.map((c, ci) => <div key={ci} style={{ fontSize: 12, color: "#bbb", padding: "2px 0" }}>• {c}</div>)}
+              </div>
+            )}
+          </div>
+        );
+      })}
+
+      {/* 레거시: 글로벌 쿨다운 */}
+      {legacyCooldown && (
+        <div style={{ background: "rgba(0,200,200,0.06)", border: "1px solid rgba(0,200,200,0.2)", borderRadius: 14, padding: 16 }}>
+          <div style={{ fontSize: 14, fontWeight: 700, color: "#4dd", marginBottom: 8 }}>❄️ 쿨다운 ({plan.cooldown?.duration}분)</div>
+          {plan.cooldown?.exercises?.map((ex, i) => <div key={i} style={{ fontSize: 13, color: "#ccc", padding: "3px 0" }}>• {ex}</div>)}
+        </div>
+      )}
+
+      {/* 새 스키마: 노트 */}
+      {isNewSchema && plan.notes_ko && plan.notes_ko.length > 0 && (
+        <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 14, padding: 16, marginTop: 16 }}>
+          <div style={{ fontSize: 14, fontWeight: 700, color: "#fff", marginBottom: 8 }}>📝 주의사항</div>
+          {plan.notes_ko.map((note, i) => <div key={i} style={{ fontSize: 13, color: "#aaa", padding: "3px 0" }}>• {note}</div>)}
+        </div>
+      )}
     </div>
   );
 }
@@ -619,6 +694,10 @@ function TodayTab({ session, onGetWorkout, onToggle, onSaveNotes, plan }) {
     </div>
   );
 
+  // 새 스키마 vs 레거시 스키마 호환
+  const isNewSchema = session.title_ko !== undefined;
+  const sessionName = isNewSchema ? session.title_ko : session.name;
+
   const doneCount = session.completed?.filter(Boolean).length || 0;
   const total = session.exercises?.length || 0;
   const progress = total > 0 ? (doneCount / total) * 100 : 0;
@@ -626,7 +705,7 @@ function TodayTab({ session, onGetWorkout, onToggle, onSaveNotes, plan }) {
   return (
     <div style={{ padding: 16 }}>
       <div style={{ background: "linear-gradient(135deg,rgba(124,92,252,0.2),rgba(92,138,252,0.1))", border: "1px solid rgba(124,92,252,0.3)", borderRadius: 16, padding: 20, marginBottom: 16 }}>
-        <div style={{ fontSize: 18, fontWeight: 700, color: "#fff" }}>🏋️ {session.name}</div>
+        <div style={{ fontSize: 18, fontWeight: 700, color: "#fff" }}>🏋️ {sessionName}</div>
         <div style={{ fontSize: 13, color: "#aaa", marginTop: 4 }}>{today()}</div>
         <div style={{ marginTop: 14 }}>
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "#aaa", marginBottom: 6 }}>
@@ -636,18 +715,24 @@ function TodayTab({ session, onGetWorkout, onToggle, onSaveNotes, plan }) {
         </div>
         {progress === 100 && <div style={{ marginTop: 12, textAlign: "center", fontSize: 20 }}>🎉 오늘 운동 완료! 수고하셨습니다!</div>}
       </div>
-      {session.exercises?.map((ex, i) => (
-        <div key={i} className={`check-item ${session.completed?.[i] ? "done" : ""}`} onClick={() => onToggle(i)}>
-          <div className={`checkbox ${session.completed?.[i] ? "checked" : ""}`}>
-            {session.completed?.[i] && <span style={{ color: "white", fontSize: 12 }}>✓</span>}
+      {session.exercises?.map((ex, i) => {
+        // 새 스키마 vs 레거시 스키마 필드 매핑
+        const exName = ex.name_ko || ex.name;
+        const exMuscle = ex.muscle_ko || ex.muscle;
+
+        return (
+          <div key={i} className={`check-item ${session.completed?.[i] ? "done" : ""}`} onClick={() => onToggle(i)}>
+            <div className={`checkbox ${session.completed?.[i] ? "checked" : ""}`}>
+              {session.completed?.[i] && <span style={{ color: "white", fontSize: 12 }}>✓</span>}
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 14, fontWeight: 600, color: session.completed?.[i] ? "#666" : "#fff", textDecoration: session.completed?.[i] ? "line-through" : "none" }}>{exName}</div>
+              <div style={{ fontSize: 12, color: "#666", marginTop: 2 }}>{ex.sets}세트 × {ex.reps} • 휴식 {ex.rest_seconds}초</div>
+            </div>
+            <span className="badge" style={{ background: "rgba(124,92,252,0.15)", color: "#b4a0ff" }}>{exMuscle}</span>
           </div>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 14, fontWeight: 600, color: session.completed?.[i] ? "#666" : "#fff", textDecoration: session.completed?.[i] ? "line-through" : "none" }}>{ex.name}</div>
-            <div style={{ fontSize: 12, color: "#666", marginTop: 2 }}>{ex.sets}세트 × {ex.reps} • 휴식 {ex.rest_seconds}초</div>
-          </div>
-          <span className="badge" style={{ background: "rgba(124,92,252,0.15)", color: "#b4a0ff" }}>{ex.muscle}</span>
-        </div>
-      ))}
+        );
+      })}
       <div style={{ marginTop: 20 }}>
         <div style={{ fontSize: 14, fontWeight: 600, color: "#fff", marginBottom: 8 }}>📝 오늘 메모</div>
         <textarea className="input-field" placeholder="운동 후기, 느낀 점을 적어보세요..." value={notes} onChange={e => setNotes(e.target.value)} onBlur={() => onSaveNotes(notes)} style={{ height: 100, resize: "none", lineHeight: 1.6 }} />
