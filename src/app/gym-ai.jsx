@@ -36,15 +36,10 @@ const ONBOARDING_QUESTIONS = [
 
 // ─── AI API Call ──────────────────────────────────────────────────────────────
 async function callAI(messages, systemPrompt) {
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
+  const response = await fetch("/api/chat", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 1000,
-      system: systemPrompt,
-      messages,
-    }),
+    body: JSON.stringify({ messages, system: systemPrompt }),
   });
   const data = await response.json();
   const text = data.content?.find(b => b.type === "text")?.text || "";
