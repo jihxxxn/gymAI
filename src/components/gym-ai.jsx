@@ -539,6 +539,34 @@ JSON 구조:
     }
   }
 
+  async function reorderDays(fromIndex, toIndex) {
+    if (!workoutPlan || !workoutPlan.days) return;
+    if (fromIndex < 0 || toIndex < 0) return;
+    if (fromIndex >= workoutPlan.days.length || toIndex >= workoutPlan.days.length) return;
+
+    const reorderedPlan = JSON.parse(JSON.stringify(workoutPlan)); // deep copy
+    const [movedDay] = reorderedPlan.days.splice(fromIndex, 1);
+    reorderedPlan.days.splice(toIndex, 0, movedDay);
+
+    // day_index 또는 day 번호 재정렬
+    reorderedPlan.days.forEach((day, idx) => {
+      if (day.day_index !== undefined) {
+        day.day_index = idx + 1;
+      } else if (day.day !== undefined) {
+        day.day = idx + 1;
+      }
+    });
+
+    setWorkoutPlan(reorderedPlan);
+
+    // Supabase에 저장
+    try {
+      await saveWorkoutPlan(user.id, reorderedPlan);
+    } catch (e) {
+      console.error("플랜 저장 실패:", e);
+    }
+  }
+
   function getTodayWorkout() {
     if (!workoutPlan) return "아직 운동 루틴이 없어요!";
     const dayOfWeek = new Date().getDay();
@@ -644,7 +672,7 @@ JSON 구조:
       {/* Content */}
       <div style={{ maxWidth: 700, margin: "0 auto", paddingBottom: "72px" }}>
         {activeTab === "chat" && <ChatTab messages={messages} isTyping={isTyping} inputText={inputText} setInputText={setInputText} onSend={handleTextInput} onOption={handleOptionSelect} messagesEndRef={messagesEndRef} />}
-        {activeTab === "plan" && <PlanTab plan={workoutPlan} />}
+        {activeTab === "plan" && <PlanTab plan={workoutPlan} onReorderDays={reorderDays} />}
         {activeTab === "today" && <TodayTab session={todaySession} onGetWorkout={() => handleTextInput("오늘 운동 알려줘")} onToggle={toggleExercise} onSaveNotes={handleSaveNotes} plan={workoutPlan} />}
         {activeTab === "progress" && <ProgressTab sessions={sessions} />}
         {activeTab === "exercises" && <ExercisesTab exercises={EXERCISE_DB} />}
@@ -747,7 +775,7 @@ function ChatTab({ messages, isTyping, inputText, setInputText, onSend, onOption
 }
 
 // ─── Plan Tab ─────────────────────────────────────────────────────────────────
-function PlanTab({ plan }) {
+function PlanTab({ plan, onReorderDays }) {
   if (!plan) return (
     <div style={{ padding: 32, textAlign: "center" }}>
       <div style={{ fontSize: 48, marginBottom: 16 }}>📋</div>
@@ -795,9 +823,42 @@ function PlanTab({ plan }) {
         return (
           <div key={i} className="day-card">
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-              <div>
-                <div style={{ fontSize: 16, fontWeight: 700, color: "#fff" }}>Day {dayIndex} – {dayTitle}</div>
-                <div style={{ fontSize: 12, color: "#7c5cfc", marginTop: 2 }}>{dayFocus}</div>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                {/* 순서 변경 버튼 */}
+                <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                  <button
+                    onClick={() => onReorderDays && onReorderDays(i, i - 1)}
+                    disabled={i === 0}
+                    style={{
+                      background: i === 0 ? "rgba(255,255,255,0.02)" : "rgba(124,92,252,0.15)",
+                      border: "none",
+                      borderRadius: 6,
+                      padding: "4px 8px",
+                      color: i === 0 ? "#444" : "#b4a0ff",
+                      cursor: i === 0 ? "not-allowed" : "pointer",
+                      fontSize: 12,
+                      fontFamily: "'Noto Sans KR', sans-serif",
+                    }}
+                  >▲</button>
+                  <button
+                    onClick={() => onReorderDays && onReorderDays(i, i + 1)}
+                    disabled={i === plan.days.length - 1}
+                    style={{
+                      background: i === plan.days.length - 1 ? "rgba(255,255,255,0.02)" : "rgba(124,92,252,0.15)",
+                      border: "none",
+                      borderRadius: 6,
+                      padding: "4px 8px",
+                      color: i === plan.days.length - 1 ? "#444" : "#b4a0ff",
+                      cursor: i === plan.days.length - 1 ? "not-allowed" : "pointer",
+                      fontSize: 12,
+                      fontFamily: "'Noto Sans KR', sans-serif",
+                    }}
+                  >▼</button>
+                </div>
+                <div>
+                  <div style={{ fontSize: 16, fontWeight: 700, color: "#fff" }}>Day {dayIndex} – {dayTitle}</div>
+                  <div style={{ fontSize: 12, color: "#7c5cfc", marginTop: 2 }}>{dayFocus}</div>
+                </div>
               </div>
               <span className="badge" style={{ background: "rgba(124,92,252,0.2)", color: "#b4a0ff" }}>⏱️ {dayDuration}분</span>
             </div>

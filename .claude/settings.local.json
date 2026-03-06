@@ -5,7 +5,8 @@
       "Bash(git commit -m \"$\\(cat <<''EOF''\nfeat: 새 플랜 스키마 + Zod 검증 + RLS 보안 구현\n\n- Zod 기반 플랜 JSON 스키마 검증 추가\n- AI 응답 실패 시 자동 재시도 + 폴백 플랜\n- 레거시 플랜 → 새 스키마 마이그레이션 지원\n- /api/plan POST/GET 라우트 구현\n- Supabase SSR 클라이언트 \\(App Router 호환\\)\n- UI 새 스키마 호환 \\(PlanTab, TodayTab\\)\n- RLS 정책 SQL 스크립트 추가\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
       "Bash(git push:*)",
       "WebFetch(domain:gym-ai-ten.vercel.app)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(git commit:*)"
     ]
   }
 }
