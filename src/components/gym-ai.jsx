@@ -338,6 +338,15 @@ JSON 구조:
     if (lower.includes("오늘") && (lower.includes("운동") || lower.includes("뭐") || lower.includes("해야"))) return getTodayWorkout();
     if (lower.includes("너무 어렵") || lower.includes("힘들어")) return "강도를 낮춰드릴게요! 세트 수를 줄이거나 더 가벼운 무게로 시작해보세요. 💙";
     if (lower.includes("너무 쉽") || lower.includes("강도 높여")) return "좋아요! 무게를 5~10% 늘리거나 세트를 1개 추가해보세요. 💪";
+
+    // 루틴 변경 요청 감지
+    const wantsNewPlan = (lower.includes("루틴") || lower.includes("플랜") || lower.includes("계획")) &&
+      (lower.includes("변경") || lower.includes("바꿔") || lower.includes("바꾸") || lower.includes("새로") || lower.includes("다시") || lower.includes("만들어"));
+    if (wantsNewPlan) {
+      return await regenerateWorkoutPlan();
+    }
+
+    // 단순 루틴 보기
     if (lower.includes("루틴") || lower.includes("계획")) { setActiveTab("plan"); return "운동 계획 탭으로 이동했어요! 💪"; }
     if (lower.includes("진행") || lower.includes("기록")) { setActiveTab("progress"); return "진행 상황 탭으로 이동했어요! 📊"; }
     const systemPrompt = `당신은 한국어로 대화하는 친절한 AI 퍼스널 트레이너입니다.`;
@@ -345,6 +354,27 @@ JSON 구조:
       return await callAI([{ role: "user", content: text }], systemPrompt);
     } catch {
       return "잠시 문제가 발생했어요. 다시 시도해 주세요! 💙";
+    }
+  }
+
+  async function regenerateWorkoutPlan() {
+    setIsTyping(true);
+    addMessage("assistant", "새로운 운동 루틴을 만들고 있어요... 🏋️");
+
+    try {
+      const plan = await generateWorkoutPlan(userProfile);
+      setWorkoutPlan(plan);
+
+      // Supabase에 새 플랜 저장
+      await saveWorkoutPlan(user.id, plan);
+
+      setIsTyping(false);
+      const splitName = plan.split_name_ko || plan.split;
+      setActiveTab("plan");
+      return `새로운 ${splitName}이 완성되었습니다! 💪\n\n'운동 계획' 탭에서 확인하세요!`;
+    } catch (error) {
+      setIsTyping(false);
+      return "루틴 생성 중 문제가 발생했어요. 다시 시도해 주세요! 💙";
     }
   }
 
