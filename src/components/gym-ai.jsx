@@ -42,7 +42,7 @@ const ONBOARDING_QUESTIONS = [
   { key: "height_weight", text: "키와 몸무게를 알려주세요.\n(예: 175cm, 70kg)", options: null },
   { key: "goal", text: "운동 목표가 무엇인가요?", options: ["체지방 감소", "근육 증가", "전반적인 건강", "체력 향상"] },
   { key: "experience", text: "헬스 경험이 어느 정도 되시나요?", options: ["완전 초보 (처음)", "초보 (3개월 미만)", "초급 (3~6개월)"] },
-  { key: "frequency", text: "일주일에 몇 번 운동하고 싶으신가요?", options: ["주 2회", "주 3회", "주 4회", "주 5회"] },
+  { key: "frequency", text: "일주일에 몇 번 운동하고 싶으신가요?", options: ["주 2회", "주 3회", "주 4회", "주 5회", "주 6회"] },
   { key: "injuries", text: "부상이나 신체적 제한 사항이 있으신가요?", options: ["없음", "무릎 통증", "허리 통증", "어깨 통증", "기타"] },
   { key: "equipment", text: "사용 가능한 기구를 알려주세요.", options: ["풀장비 헬스장", "덤벨만", "머신 위주", "맨몸 운동만"] },
 ];
@@ -322,8 +322,75 @@ JSON 구조:
           { name: "플랭크", sets: 3, reps: "30초", rest_seconds: 60, instructions: "일자로 유지하세요", muscle: "코어" },
         ]},
       ],
+      5: [
+        { day: 1, name: "가슴", focus: "가슴 전체", duration: 45, exercises: [
+          { name: "벤치 프레스", sets: 4, reps: "10", rest_seconds: 90, instructions: "가슴으로 내리고 밀어올리세요", muscle: "가슴" },
+          { name: "인클라인 덤벨 프레스", sets: 3, reps: "12", rest_seconds: 90, instructions: "인클라인에서 밀어올리세요", muscle: "가슴 상부" },
+          { name: "케이블 플라이", sets: 3, reps: "15", rest_seconds: 60, instructions: "가슴을 모아주세요", muscle: "가슴" },
+        ]},
+        { day: 2, name: "등", focus: "등 전체", duration: 45, exercises: [
+          { name: "랫 풀다운", sets: 4, reps: "12", rest_seconds: 90, instructions: "날개뼈를 모으며 당기세요", muscle: "등" },
+          { name: "케이블 로우", sets: 3, reps: "12", rest_seconds: 90, instructions: "배꼽 방향으로 당기세요", muscle: "등 중부" },
+          { name: "덤벨 로우", sets: 3, reps: "12", rest_seconds: 75, instructions: "옆구리로 당기세요", muscle: "광배근" },
+        ]},
+        { day: 3, name: "어깨", focus: "어깨 전체", duration: 40, exercises: [
+          { name: "숄더 프레스", sets: 4, reps: "10", rest_seconds: 90, instructions: "위로 밀어올리세요", muscle: "어깨" },
+          { name: "사이드 레터럴 레이즈", sets: 3, reps: "15", rest_seconds: 60, instructions: "옆으로 올리세요", muscle: "측면 어깨" },
+          { name: "페이스 풀", sets: 3, reps: "15", rest_seconds: 60, instructions: "얼굴 방향으로 당기세요", muscle: "후면 어깨" },
+        ]},
+        { day: 4, name: "하체", focus: "전체 하체", duration: 55, exercises: [
+          { name: "레그 프레스", sets: 4, reps: "12", rest_seconds: 90, instructions: "발판을 밀어내듯 펴세요", muscle: "대퇴사두" },
+          { name: "레그 컬", sets: 3, reps: "12", rest_seconds: 90, instructions: "말아올리세요", muscle: "햄스트링" },
+          { name: "레그 익스텐션", sets: 3, reps: "15", rest_seconds: 60, instructions: "다리를 펴세요", muscle: "대퇴사두" },
+          { name: "칼프 레이즈", sets: 4, reps: "20", rest_seconds: 60, instructions: "종아리를 수축하세요", muscle: "종아리" },
+        ]},
+        { day: 5, name: "팔 & 복근", focus: "이두, 삼두, 복근", duration: 45, exercises: [
+          { name: "덤벨 컬", sets: 3, reps: "12", rest_seconds: 60, instructions: "말아올리세요", muscle: "이두" },
+          { name: "트라이셉스 푸시다운", sets: 3, reps: "12", rest_seconds: 60, instructions: "아래로 누르세요", muscle: "삼두" },
+          { name: "케이블 크런치", sets: 3, reps: "15", rest_seconds: 60, instructions: "복근을 수축하세요", muscle: "복근" },
+          { name: "플랭크", sets: 3, reps: "30초", rest_seconds: 60, instructions: "일자로 유지하세요", muscle: "코어" },
+        ]},
+      ],
+      6: [
+        { day: 1, name: "푸쉬 A (가슴 중심)", focus: "가슴, 어깨, 삼두", duration: 50, exercises: [
+          { name: "벤치 프레스", sets: 4, reps: "8", rest_seconds: 90, instructions: "가슴으로 내리고 밀어올리세요", muscle: "가슴" },
+          { name: "인클라인 덤벨 프레스", sets: 3, reps: "10", rest_seconds: 90, instructions: "인클라인에서 밀어올리세요", muscle: "가슴 상부" },
+          { name: "사이드 레터럴 레이즈", sets: 3, reps: "15", rest_seconds: 60, instructions: "옆으로 올리세요", muscle: "측면 어깨" },
+          { name: "트라이셉스 푸시다운", sets: 3, reps: "12", rest_seconds: 60, instructions: "아래로 누르세요", muscle: "삼두" },
+        ]},
+        { day: 2, name: "풀 A (등 중심)", focus: "등, 이두", duration: 50, exercises: [
+          { name: "랫 풀다운", sets: 4, reps: "10", rest_seconds: 90, instructions: "날개뼈를 모으며 당기세요", muscle: "등" },
+          { name: "케이블 로우", sets: 3, reps: "12", rest_seconds: 90, instructions: "배꼽 방향으로 당기세요", muscle: "등 중부" },
+          { name: "페이스 풀", sets: 3, reps: "15", rest_seconds: 60, instructions: "얼굴 방향으로 당기세요", muscle: "후면 어깨" },
+          { name: "덤벨 컬", sets: 3, reps: "12", rest_seconds: 60, instructions: "말아올리세요", muscle: "이두" },
+        ]},
+        { day: 3, name: "레그 A", focus: "대퇴사두 중심", duration: 50, exercises: [
+          { name: "레그 프레스", sets: 4, reps: "10", rest_seconds: 90, instructions: "발판을 밀어내듯 펴세요", muscle: "대퇴사두" },
+          { name: "레그 익스텐션", sets: 3, reps: "12", rest_seconds: 60, instructions: "다리를 펴세요", muscle: "대퇴사두" },
+          { name: "레그 컬", sets: 3, reps: "12", rest_seconds: 60, instructions: "말아올리세요", muscle: "햄스트링" },
+          { name: "칼프 레이즈", sets: 4, reps: "20", rest_seconds: 45, instructions: "종아리를 수축하세요", muscle: "종아리" },
+        ]},
+        { day: 4, name: "푸쉬 B (어깨 중심)", focus: "어깨, 가슴, 삼두", duration: 50, exercises: [
+          { name: "숄더 프레스", sets: 4, reps: "10", rest_seconds: 90, instructions: "위로 밀어올리세요", muscle: "어깨" },
+          { name: "인클라인 덤벨 프레스", sets: 3, reps: "12", rest_seconds: 90, instructions: "인클라인에서 밀어올리세요", muscle: "가슴 상부" },
+          { name: "사이드 레터럴 레이즈", sets: 3, reps: "15", rest_seconds: 60, instructions: "옆으로 올리세요", muscle: "측면 어깨" },
+          { name: "트라이셉스 푸시다운", sets: 3, reps: "12", rest_seconds: 60, instructions: "아래로 누르세요", muscle: "삼두" },
+        ]},
+        { day: 5, name: "풀 B", focus: "등, 이두", duration: 50, exercises: [
+          { name: "덤벨 로우", sets: 4, reps: "10", rest_seconds: 90, instructions: "옆구리로 당기세요", muscle: "광배근" },
+          { name: "랫 풀다운", sets: 3, reps: "12", rest_seconds: 90, instructions: "날개뼈를 모으며 당기세요", muscle: "등" },
+          { name: "페이스 풀", sets: 3, reps: "15", rest_seconds: 60, instructions: "얼굴 방향으로 당기세요", muscle: "후면 어깨" },
+          { name: "덤벨 컬", sets: 3, reps: "12", rest_seconds: 60, instructions: "말아올리세요", muscle: "이두" },
+        ]},
+        { day: 6, name: "레그 B", focus: "햄스트링, 둔근 중심", duration: 50, exercises: [
+          { name: "레그 컬", sets: 4, reps: "10", rest_seconds: 90, instructions: "말아올리세요", muscle: "햄스트링" },
+          { name: "힙 어브덕션", sets: 3, reps: "15", rest_seconds: 60, instructions: "다리를 벌려주세요", muscle: "엉덩이" },
+          { name: "레그 프레스", sets: 3, reps: "12", rest_seconds: 90, instructions: "발판을 밀어내듯 펴세요", muscle: "하체" },
+          { name: "칼프 레이즈", sets: 4, reps: "20", rest_seconds: 45, instructions: "종아리를 수축하세요", muscle: "종아리" },
+        ]},
+      ],
     };
-    const dayCount = Math.min(Math.max(days, 2), 4);
+    const dayCount = Math.min(Math.max(days, 2), 6);
     return {
       split: `${dayCount}일 분할 루틴`,
       weeklySchedule: `주 ${dayCount}회 운동. 운동일 사이에 충분한 휴식을 취하세요.`,
@@ -339,6 +406,16 @@ JSON 구조:
     if (lower.includes("너무 어렵") || lower.includes("힘들어")) return "강도를 낮춰드릴게요! 세트 수를 줄이거나 더 가벼운 무게로 시작해보세요. 💙";
     if (lower.includes("너무 쉽") || lower.includes("강도 높여")) return "좋아요! 무게를 5~10% 늘리거나 세트를 1개 추가해보세요. 💪";
 
+    // 주 N일 루틴 요청 감지 (예: "주 5일로 바꿔줘", "5일 루틴으로 변경")
+    const daysMatch = text.match(/(?:주\s*)?(\d)\s*(?:일|회)/);
+    const wantsDayChange = daysMatch && (lower.includes("바꿔") || lower.includes("변경") || lower.includes("만들어") || lower.includes("루틴") || lower.includes("플랜"));
+    if (wantsDayChange && daysMatch[1]) {
+      const requestedDays = parseInt(daysMatch[1]);
+      if (requestedDays >= 2 && requestedDays <= 6) {
+        return await regenerateWorkoutPlan(requestedDays);
+      }
+    }
+
     // 루틴 변경 요청 감지
     const wantsNewPlan = (lower.includes("루틴") || lower.includes("플랜") || lower.includes("계획")) &&
       (lower.includes("변경") || lower.includes("바꿔") || lower.includes("바꾸") || lower.includes("새로") || lower.includes("다시") || lower.includes("만들어"));
@@ -349,21 +426,42 @@ JSON 구조:
     // 단순 루틴 보기
     if (lower.includes("루틴") || lower.includes("계획")) { setActiveTab("plan"); return "운동 계획 탭으로 이동했어요! 💪"; }
     if (lower.includes("진행") || lower.includes("기록")) { setActiveTab("progress"); return "진행 상황 탭으로 이동했어요! 📊"; }
-    const systemPrompt = `당신은 한국어로 대화하는 친절한 AI 퍼스널 트레이너입니다.`;
+
+    // AI 대화 - 이전 대화 히스토리 포함 (최근 10개)
+    const systemPrompt = `당신은 한국어로 대화하는 친절한 AI 퍼스널 트레이너입니다. 사용자의 운동 목표와 이전 대화 맥락을 기억하고 일관성 있게 답변하세요.`;
     try {
-      return await callAI([{ role: "user", content: text }], systemPrompt);
+      // 최근 대화 히스토리 구성
+      const recentMessages = messages.slice(-10).map(m => ({
+        role: m.role,
+        content: m.text
+      }));
+      recentMessages.push({ role: "user", content: text });
+      return await callAI(recentMessages, systemPrompt);
     } catch {
       return "잠시 문제가 발생했어요. 다시 시도해 주세요! 💙";
     }
   }
 
-  async function regenerateWorkoutPlan() {
+  async function regenerateWorkoutPlan(requestedDays = null) {
     setIsTyping(true);
-    addMessage("assistant", "새로운 운동 루틴을 만들고 있어요... 🏋️");
+    const daysText = requestedDays ? `주 ${requestedDays}일` : "새로운";
+    addMessage("assistant", `${daysText} 운동 루틴을 만들고 있어요... 🏋️`);
 
     try {
-      const plan = await generateWorkoutPlan(userProfile);
+      // 요청된 일수가 있으면 프로필에 반영
+      const profileForPlan = requestedDays
+        ? { ...userProfile, frequency: `주 ${requestedDays}회` }
+        : userProfile;
+
+      const plan = await generateWorkoutPlan(profileForPlan);
       setWorkoutPlan(plan);
+
+      // 프로필 업데이트 (요청된 일수가 있으면)
+      if (requestedDays) {
+        const updatedProfile = { ...userProfile, frequency: `주 ${requestedDays}회` };
+        setUserProfile(updatedProfile);
+        await saveProfile({ user_id: user.id, ...updatedProfile });
+      }
 
       // Supabase에 새 플랜 저장
       await saveWorkoutPlan(user.id, plan);
@@ -371,7 +469,7 @@ JSON 구조:
       setIsTyping(false);
       const splitName = plan.split_name_ko || plan.split;
       setActiveTab("plan");
-      return `새로운 ${splitName}이 완성되었습니다! 💪\n\n'운동 계획' 탭에서 확인하세요!`;
+      return `${splitName}이 완성되었습니다! 💪\n\n'운동 계획' 탭에서 확인하세요!`;
     } catch (error) {
       setIsTyping(false);
       return "루틴 생성 중 문제가 발생했어요. 다시 시도해 주세요! 💙";
