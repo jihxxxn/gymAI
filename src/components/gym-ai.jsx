@@ -403,8 +403,14 @@ JSON 구조:
   async function handleChatMessage(text) {
     const lower = text.toLowerCase();
     if (lower.includes("오늘") && (lower.includes("운동") || lower.includes("뭐") || lower.includes("해야"))) return getTodayWorkout();
-    if (lower.includes("너무 어렵") || lower.includes("힘들어")) return "강도를 낮춰드릴게요! 세트 수를 줄이거나 더 가벼운 무게로 시작해보세요. 💙";
-    if (lower.includes("너무 쉽") || lower.includes("강도 높여")) return "좋아요! 무게를 5~10% 늘리거나 세트를 1개 추가해보세요. 💪";
+
+    // 운동 강도 조절
+    if (lower.includes("너무 어렵") || lower.includes("힘들어") || lower.includes("어려워")) {
+      return await adjustIntensity("decrease");
+    }
+    if (lower.includes("너무 쉽") || lower.includes("강도 높여") || lower.includes("쉬워")) {
+      return await adjustIntensity("increase");
+    }
 
     // 주 N일 루틴 요청 감지 (예: "주 5일로 바꿔줘", "5일 루틴으로 변경")
     const daysMatch = text.match(/(?:주\s*)?(\d)\s*(?:일|회)/);
@@ -473,6 +479,63 @@ JSON 구조:
     } catch (error) {
       setIsTyping(false);
       return "루틴 생성 중 문제가 발생했어요. 다시 시도해 주세요! 💙";
+    }
+  }
+
+  async function adjustIntensity(direction) {
+    if (!workoutPlan) {
+      return "아직 운동 루틴이 없어요! 먼저 루틴을 만들어주세요.";
+    }
+
+    const isIncrease = direction === "increase";
+    const adjustedPlan = JSON.parse(JSON.stringify(workoutPlan)); // deep copy
+
+    // 각 운동의 강도 조절
+    adjustedPlan.days.forEach(day => {
+      day.exercises.forEach(ex => {
+        if (isIncrease) {
+          // 강도 높이기: 세트 +1, 휴식 -15초
+          ex.sets = Math.min((ex.sets || 3) + 1, 6);
+          ex.rest_seconds = Math.max((ex.rest_seconds || 60) - 15, 30);
+          // reps 증가 (문자열 처리)
+          if (typeof ex.reps === "string" && ex.reps.includes("-")) {
+            const [min, max] = ex.reps.split("-").map(Number);
+            ex.reps = `${min + 2}-${max + 2}`;
+          } else {
+            const repsNum = parseInt(ex.reps) || 10;
+            ex.reps = String(repsNum + 2);
+          }
+        } else {
+          // 강도 낮추기: 세트 -1, 휴식 +15초
+          ex.sets = Math.max((ex.sets || 3) - 1, 2);
+          ex.rest_seconds = Math.min((ex.rest_seconds || 60) + 15, 120);
+          // reps 감소 (문자열 처리)
+          if (typeof ex.reps === "string" && ex.reps.includes("-")) {
+            const [min, max] = ex.reps.split("-").map(Number);
+            ex.reps = `${Math.max(min - 2, 4)}-${Math.max(max - 2, 6)}`;
+          } else {
+            const repsNum = parseInt(ex.reps) || 10;
+            ex.reps = String(Math.max(repsNum - 2, 6));
+          }
+        }
+      });
+    });
+
+    setWorkoutPlan(adjustedPlan);
+
+    // Supabase에 저장
+    try {
+      await saveWorkoutPlan(user.id, adjustedPlan);
+    } catch (e) {
+      console.error("플랜 저장 실패:", e);
+    }
+
+    setActiveTab("plan");
+
+    if (isIncrease) {
+      return "운동 강도를 높였어요! 💪\n\n• 세트 수 +1\n• 휴식 시간 -15초\n• 반복 횟수 +2\n\n'운동 계획' 탭에서 확인하세요!";
+    } else {
+      return "운동 강도를 낮췄어요! 💙\n\n• 세트 수 -1\n• 휴식 시간 +15초\n• 반복 횟수 -2\n\n'운동 계획' 탭에서 확인하세요!";
     }
   }
 
